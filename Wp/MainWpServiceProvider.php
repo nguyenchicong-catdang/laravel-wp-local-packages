@@ -6,6 +6,6 @@ use Illuminate\Support\AggregateServiceProvider;
 
 class MainWpServiceProvider extends AggregateServiceProvider {
     protected $providers = [
-        
+        WpServiceProvider::class,
     ];
 }
