@@ -1,6 +1,3 @@
 <x-wp-comp::layout>
-    <x-slot name="title">
-        Trang Index
-    </x-slot>
-    <p>wp/views/index.blade.php</p>
+    <h1>Day la trang index</h1>
 </x-wp-comp::layout>
