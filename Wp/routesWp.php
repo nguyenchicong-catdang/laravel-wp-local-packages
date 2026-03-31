@@ -3,5 +3,5 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function() {
-    return 'abc';
+    return view('wp-view::index');
 });
