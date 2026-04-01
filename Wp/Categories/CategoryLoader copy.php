@@ -1,5 +1,4 @@
 <?php
-
 namespace Ncc\Wp\Categories;
 
 use Corcel\Model\Taxonomy;
@@ -7,7 +6,6 @@ use Corcel\Model\Taxonomy;
 class CategoryLoader extends Taxonomy
 {
     protected $connection = 'wp';
-    protected $limit = 3; // Số bài viết trên mỗi trang, có thể thay đổi tùy ý
     public function loader(string $slug = ''): array
     {
         return $this->loaderWp($slug);
@@ -15,48 +13,40 @@ class CategoryLoader extends Taxonomy
 
     private function loaderWp(string $slug = ''): array
     {
-        // Lấy Category 1 lần duy nhất ở đây
-        $categoryObject = $this::category()->slug($slug)->firstOrFail();
-        $dataCategoryCard = $this->getCategoryCard($categoryObject);
-        $dataPosts = $this->getAllPosts($categoryObject);
+        $dataCategoryCard = $this->getCategoryCard($slug);
+        $dataPosts = $this->getAllPosts($slug);
 
         return [
             'category_card' => $dataCategoryCard,
             'pagination' => [
                 'total_items' => $dataCategoryCard['count'] ?? 0, // Số lượng bài viết trong category này   
                 // 'total_items' => 0,
-                'limit' => $this->limit, // Số bài viết trên mỗi trang
+                'limit' => 3, // Số bài viết trên mỗi trang
             ],
             'posts' => $dataPosts
         ];
+
     }
 
-    private function getCategoryCard(object $categoryObject): array
+    private function getCategoryCard(string $slug = ''): array
     {
+        $data = $this::category()->slug($slug)->firstOrFail();
         // Logic to load categories, e.g., from a database or an API
         return [
-            'name'        => $categoryObject?->term?->name,
-            'slug'        => $categoryObject?->term?->slug,
-            'description' => $categoryObject?->description, // Lưu ý: description thường nằm ở table taxonomy, không phải term
-            'count' => $categoryObject?->count, // Số lượng bài viết trong category này
+            'name'        => $data?->term?->name,
+            'slug'        => $data?->term?->slug,
+            'description' => $data?->description, // Lưu ý: description thường nằm ở table taxonomy, không phải term
+            'count' => $data?->count, // Số lượng bài viết trong category này
+            
+
         ];
+        
     }
 
-    private function getAllPosts(object $categoryObject): array
+    private function getAllPosts(string $slug = ''): array
     {
-        $limit = $this->limit; // Số bài trên 1 trang
-        $currentPage = (int) request()->query('page', 1); // Trang hiện tại
-        $offset = ($currentPage - 1) * $limit; // Tính vị trí bắt đầu lấy
-
-
-        // $category = $this::category()->slug($slug)->firstOrFail();
-        // $posts = $category->posts()->status('publish')->with(['thumbnail', 'thumbnail.attachment'])->get(); // Lấy tất cả bài viết thuộc category này
-        $posts = $categoryObject->posts()
-            ->status('publish')
-            ->with(['thumbnail', 'thumbnail.attachment'])
-            ->skip($offset) // Bỏ qua n bài đầu
-            ->take($limit)  // Lấy đúng n bài tiếp theo
-            ->get();
+        $category = $this::category()->slug($slug)->firstOrFail();
+        $posts = $category->posts()->status('publish')->with(['thumbnail', 'thumbnail.attachment'])->get(); // Lấy tất cả bài viết thuộc category này
 
         return $posts->map(function ($post) {
             // 1. Check xem có ảnh hay không (Vị thần canh cửa)
@@ -84,7 +74,7 @@ class CategoryLoader extends Taxonomy
             return [
                 'name' => $item->term->name,
                 'slug' => $item->term->slug,
-            ];
+                ];
         })->all(); // Thêm ->all() nếu muốn chuyển về array thuần PHP
 
         // app(\Ncc\Wp\Categories\CategoryLoader::class)->test();

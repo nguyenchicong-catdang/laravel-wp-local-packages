@@ -7,3 +7,5 @@ Route::get('/', function() {
 });
 
 Route::get('/category/{slug}', [\Ncc\Wp\Categories\CategoryController::class, 'show']);
+
+Route::get('/post/{slug}', [\Ncc\Wp\Posts\PostController::class, 'show'])->name('post');
