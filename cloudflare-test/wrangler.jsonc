@@ -1,0 +1,12 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "laravel-vite-proxy",
+	"compatibility_date": "2026-04-03",
+	"assets": {
+		"directory": "./public", // Nơi chứa index.html hoặc file build của Vite
+	},
+	"vars": {
+		"BACKEND_URL": "http://localhost:8000",
+		"VITE_URL": "http://localhost:5173",
+	},
+}
